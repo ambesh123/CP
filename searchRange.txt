@@ -1,0 +1,22 @@
+vector<int> searchRange(const vector<int> &A, int B) {
+    int i1 = -1 , i2 = -1;
+
+    int lo = 0 , hi = A.size()-1;
+    while(lo < hi){
+        int mid = (lo+hi)>>1;
+        if(A[mid] >= B){hi = mid;}
+        else lo = mid+1;
+    }
+    i1 = lo;
+    lo = i1 , hi = A.size()-1;
+    while(hi-lo>1){
+        int mid = (lo+hi)>>1;
+        if(A[mid] == B)lo = mid;
+        else hi = mid-1;
+    }
+    if(A[hi] == B)i2 = hi;
+    else i2 = lo;
+    if(A[i1] != B)return vector<int>({-1,-1});
+    else return vector<int>({i1,i2});
+}
+

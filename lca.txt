@@ -1,0 +1,48 @@
+
+const int ML = 20;
+
+vector<pair<int,int> > adj[MAXN];
+int lvl[MAXN];
+int par[MAXN][ML];
+
+void pre(int n){
+    lvl[0] = -1;
+    for(int l = 1; l < ML; l++){
+        for(int i = 1; i <= n; i++){
+            par[i][l] = par[par[i][l-1]][l-1];
+        }
+    }
+}
+
+void dfs(int x){
+    
+    for(auto c : adj[x]){
+        if(c.first != par[x][0]){
+            par[c.first][0] = x;
+            lvl[c.first] = lvl[x] + 1;
+            dfs(c.first);
+        }
+    }
+}
+
+int lca(int x , int y){
+    if(lvl[x] < lvl[y])swap(x,y);
+    
+    for(int l = ML-1; l >= 0; l--){
+        if(lvl[par[x][l]] >= lvl[y])x = par[x][l];
+    }
+    
+    if(x == y)return x;
+    
+    for(int l = ML-1; l >= 0; l--){
+        if(par[x][l] != par[y][l]){
+            x = par[x][l];
+            y = par[y][l];
+        }
+    }
+    
+    assert(par[x][0] == par[y][0]);
+    
+    return par[x][0];
+    
+}

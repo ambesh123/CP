@@ -1,0 +1,22 @@
+const int mod = 1000000007;
+
+ll fac[MAXN];
+ll inv[MAXN];
+
+ll modPower(ll x,ll y){
+    x%=mod;
+    ll res = 1;
+    while(y){
+        if(y&1)res= (res*x)%mod;
+        x = (x*x)%mod;
+        y>>=1;
+    }
+    return res;
+}
+
+void pre(){
+    fac[0] = 1;
+    for(ll i = 1; i < MAXN; i++)fac[i] = (i * fac[i-1])%mod;
+    inv[MAXN-1] = modPower(fac[MAXN-1] , mod-2);
+    for(ll i = MAXN-2; i >= 0; i--)inv[i] = (inv[i+1] * (i+1))%mod;
+}

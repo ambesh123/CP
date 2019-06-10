@@ -1,0 +1,32 @@
+
+int par[MAXN];
+int rnk[MAXN];
+int cnt[MAXN];
+
+void ini(){
+    for(int i = 0; i < MAXN; i++)par[i] = i;
+    fill(rnk,rnk+MAXN , 0);
+    fill(cnt , cnt+MAXN , 1);
+}
+int findR(int x ){
+    if(par[x] == x)return x;
+    return par[x] = findR(par[x]);
+}
+
+void unn(int x , int y){
+    int a = findR(x) , b = findR(y);
+    if(a == b)return;
+    if(rnk[a] > rnk[b]){
+        par[b] = a;
+        cnt[a] += cnt[b];
+    }
+    else if(rnk[b] > rnk[a]){
+        par[a] = b;
+        cnt[b] += cnt[a];
+    }
+    else{
+        par[b] = a;
+        cnt[a] += cnt[b];
+        rnk[a]++;
+    }
+}
