@@ -1,0 +1,153 @@
+                      //  @ /\/\ BESH //
+
+#include <bits/stdc++.h>
+#define inp_out_work ios::sync_with_stdio(false); cin.tie(NULL); cout.tie(NULL);
+#define testCase    int T; cin>>T; while(T--)
+#define fr(i,n) for(int i=0;i<n;i++)
+#define fro(i,s,e) for(int i=s;i<=e;i++)
+#define endl '\n'
+#define debug(P) cout<<#P<<" = "<<P<<endl;
+#define pb push_back
+#define FILE freopen("in.txt","r",stdin); freopen("out.txt","w",stdout);
+
+
+using namespace std;
+
+typedef long long ll;
+typedef long double ld;
+
+const int MAXN = 100005;
+const int mod = 1000000007;
+
+class SegTree{  // sum Segment Tree (with lazy updates)
+    private:
+
+        long *tree;
+        int *len;
+        long *lazy;
+
+        int N;
+
+        void build(){
+            for(int i = N; i < N<<1 ; i++)len[i] = 1;
+
+            for(int i = N-1; i > 0; i--){
+                tree[i] = tree[i<<1] + tree[i<<1|1];
+                len[i] = len[i<<1] + len[i<<1|1];
+                lazy[i] = 0;
+            }
+            lazy[0] = 0;
+        }
+
+        void pushUpdates(int x){
+            int h = log2(x) + 1;
+            for(int s =h;  s > 0; s--){
+                int i = x>>s;
+                if(lazy[i] != 0){
+                    tree[i<<1] += len[i<<1] * lazy[i];
+                    if((i<<1) < N)lazy[i<<1] += lazy[i];
+
+                    tree[i<<1|1] += len[i<<1|1] * lazy[i];
+                    if((i<<1|1) < N)lazy[i<<1|1] += lazy[i];
+
+                    lazy[i] = 0;
+                }
+            }
+        }
+
+    public:
+
+        SegTree(int arr[], int n){
+            tree = new long[n<<1];
+            lazy = new long[n];
+            len = new int[n<<1];
+
+            for(int i = 0; i < n; i++)tree[n+i] = arr[i];
+            N = n;
+            build();
+        }
+
+        long query(int l, int r){
+            l += N;
+            r += N;
+
+            pushUpdates(l);
+            pushUpdates(r);
+
+            long ret = 0;
+
+            while(l <= r){
+                if(l&1)ret += tree[l++];
+                if(!(r&1))ret += tree[r--];
+                l >>= 1;
+                r >>= 1;
+            }
+
+            return ret;
+        }
+
+        void rangeUpdate(int l, int r, int val){
+            l += N;
+            r += N;
+
+            int l0 = l, r0 = r;
+
+            while(l <= r){
+                if(l&1){
+                    tree[l] += len[l] * val;
+                    if(l < N)lazy[l] += val;
+                    l++;
+                }
+                if(!(r&1)){
+                    tree[r] += len[r] * val;
+                    if(r<N)lazy[r] += val;
+                    r--;
+                }
+                l >>= 1;
+                r >>= 1;
+            }
+
+            while (l0 > 1) l0 >>= 1, tree[l0] = tree[l0<<1] + tree[l0<<1|1] + len[l0]*lazy[l0];
+            while (r0 > 1) r0 >>= 1, tree[r0] = tree[r0<<1] + tree[r0<<1|1] + len[r0]*lazy[r0];
+
+        }
+
+};
+
+
+int main(){
+    int n = 10;
+    int a[n];
+    fill(a, a+n, 0);
+    SegTree st(a, n);
+
+    while(1){
+        int type;
+        cin>>type;
+        if(type == 1){
+            int l, r, v;
+            cin>>l>>r>>v;
+            st.rangeUpdate(l, r, v);
+
+            for(int i =l; i <= r; i++)a[i] += v;
+            cout<<"Original \n";
+            for(int i =0; i < n; i++){
+                cout<<a[i]<<' ';
+            }
+
+            cout<<"\nSTree \n";
+
+            for(int i =0; i < n; i++){
+                cout<<st.query(i, i)<<' ';
+            }
+            cout<<endl;
+
+        }
+        else{
+            int l, r;
+            cin>>l>>r;
+            cout<< st.query(l, r) << endl;
+        }
+    }
+
+}
