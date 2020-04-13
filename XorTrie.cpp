@@ -13,6 +13,7 @@ struct trie{
 
     trie(){
         root = new node();
+        root->count = 1;
     }
 
     void insert(int x){
@@ -29,10 +30,11 @@ struct trie{
     }
 
     bool deleteHelper(node *crawl, int x, int curr_bit){
+    	if(curr_bit < 0)return false;
         int b = (x&(1<<curr_bit)) > 0;
         if(crawl->child[b] == NULL){
             //error x is not present in trie
-            return true;
+            return false;
         }
         crawl->count--;
         bool deleted = deleteHelper(crawl->child[b], x, curr_bit-1);
@@ -65,5 +67,22 @@ struct trie{
             }
         }
         return ans;
+    }
+
+    void printAll(node *p, int x, int lvl){
+    	if(p==NULL)return;
+
+    	if(lvl == -1){
+    		cout<<x<<' ';
+    		return;
+    	}
+    	printAll(p->child[0], x, lvl-1);
+    	printAll(p->child[1], x|(1<<lvl), lvl-1);
+    }
+
+    void printNumbers(){
+    	cout<<"Numbers in Trie: ";
+    	printAll(root, 0, BIT);
+    	cout<<endl;
     }
 };
