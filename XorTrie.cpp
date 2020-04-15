@@ -16,7 +16,7 @@ struct trie{
         root->count = 1;
     }
 
-    void insert(int x){
+    void insert(int x){//cout<<"Inserting "<<x<<endl;
         root->count++;
         node *crawl = root;
         for(int i = BIT; i >= 0; --i){
@@ -29,28 +29,37 @@ struct trie{
         }
     }
 
-    bool deleteHelper(node *crawl, int x, int curr_bit){
-    	if(curr_bit < 0)return false;
-        int b = (x&(1<<curr_bit)) > 0;
-        if(crawl->child[b] == NULL){
-            //error x is not present in trie
-            return false;
-        }
-        crawl->count--;
-        bool deleted = deleteHelper(crawl->child[b], x, curr_bit-1);
-
-        if(deleted)crawl->child[b] = NULL;
-
-        deleted = false;
-
-        if(crawl->count == 0){
-            delete(crawl);
-            deleted = true;
-        }
-        return deleted;
+    void deleteCompletely(node *root){
+        if(root == NULL)return;
+        deleteCompletely(root->child[0]);
+        deleteCompletely(root->child[1]);
+        delete(root);
     }
-    void deleteNumber(int x){
-        deleteHelper(root, x, BIT);
+
+    void deleteNumber(int x){//cout<<"Deleting "<<x<<endl;
+        root->count--;
+        node *crawl = root;
+        for(int i = BIT; i >= 0; --i){
+            int b = (x&(1<<i)) > 0;
+            if(crawl->child[b] == NULL){
+                //error no. does not exist
+                cout<<"No. does not exist\n";
+                return;
+            }
+            crawl = crawl->child[b];
+            crawl->count--;
+        }
+
+        crawl = root;
+        for(int i = BIT; i >= 0; --i){
+            int b = (x&(1<<i)) > 0;
+            if(crawl->child[b]->count == 0){
+                deleteCompletely(crawl->child[b]);
+                crawl->child[b] = NULL;
+                break;
+            }
+            crawl = crawl->child[b];
+        }
     }
 
     int findMaxXor(int x){
@@ -76,6 +85,7 @@ struct trie{
     		cout<<x<<' ';
     		return;
     	}
+        
     	printAll(p->child[0], x, lvl-1);
     	printAll(p->child[1], x|(1<<lvl), lvl-1);
     }
