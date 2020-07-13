@@ -2,7 +2,7 @@
 int ld[MAXN];
 
 void m_sieve(){
-    fr(i,MAXN)ld[i]=i;
+    for(int i = 0; i < MAXN; ++i)ld[i]=i;
 
     for(int i=2;i*i<MAXN;i++){
         if(ld[i]==i){
